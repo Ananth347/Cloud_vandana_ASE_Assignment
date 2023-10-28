@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #35a8de;
+        }
+        .container {
+            max-width: 400px;
+            height: 500px;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: white;
+        }
+        label, input, select, div {
+            margin-bottom: 8%;
+            padding-top: 5px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 2%;
+            padding-left: 3%;
+            background-color: #35a8de;
+        }
+        #h2 {
+            color: white;
+            font-size: 250%;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            text-align: center;
+        }
+        .popup-content {
+            background: #3498db;
+            width: 300px;
+            padding: 20px;
+            border-radius: 5px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        #l {
+            margin-left: 30%;
+        }
+        #lastName {
+            margin-left: 5%;
+        }
+        .error {
+            border: 1px solid red;
+        }
+    </style>
+</head>
+<body>
+    <h2 align="center" id="h2">Customer Survey Form</h2>
+    <div class="container">
+        <form id="surveyForm">
+            <label for="firstName">First Name:</label>
+            <label for="lastName" id="l">Last Name:</label><br>
+            <input type="text" id="firstName" required>
+            <input type="text" id="lastName" required><br>
+            <label for="dob">Date Of Birth:</label>
+            <input type="date" id="dob" required><br>
+            <label for="country">Country:</label>
+            <select id="country" required>
+                <option value="" disabled selected>Select a country</option>
+                <option value="India">India</option> 
+                <option value="USA">USA</option>
+                <option value="Canada">Canada</option>
+                <option value="UK">UK</option>
+            </select><br>
+            <label for="gender">Gender:</label>
+            
+            <input type="radio" id="male" name="gender" value="Male" required>
+            <label for="male">Male</label>
+            <input type="radio" id="female" name="gender" value="Female" required>
+            <label for="female">Female</label>
+            <input type="radio" id="other" name="gender" value="Other" required>
+            <label for="other">Other</label><br>
+            <label for="profession">Profession:</label>
+            <input type="text" id="profession" required><br>
+            <label for="email">Email:</label>
+            <input type="email" id="email" required><br>
+            <label for="mobileNumber">Mobile Number:</label>
+            <input type="tel" id="mobileNumber" required><br>
+            <button type="submit" style="margin-right: 10px;">Submit</button>
+            <button type="button" style="margin-left: 10px;" onclick="resetForm()">Reset</button>
+           
+        </form>
+    </div>
+
+    <div class="popup" id="popup">
+        <div class="popup-content">
+            <h2>Survey Form Submission</h2>
+            <div id="popupResult"></div>
+            <button onclick="closePopupAndResetForm()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        function resetForm() {
+            document.getElementById("surveyForm").reset();
+            document.getElementById("mobileNumber").classList.remove("error");
+        }
+
+        function closePopupAndResetForm() {
+            closePopup();
+            resetForm();
+        }
+
+        function closePopup() {
+            document.getElementById("popup").style.display = "none";
+        }
+
+        document.getElementById("surveyForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            
+            const firstName = document.getElementById("firstName").value;
+            const lastName = document.getElementById("lastName").value;
+            const dob = document.getElementById("dob").value;
+            const country = document.getElementById("country").value;
+            const gender = document.querySelector('input[name="gender"]:checked').value; // Corrected: Get the selected radio button
+            const profession = document.getElementById("profession").value;
+            const email = document.getElementById("email").value;
+            const mobileNumber = document.getElementById("mobileNumber").value;
+
+            
+            const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+            const mobilePattern = /^\d{10}$/;
+            const isEmailValid = emailPattern.test(email);
+            const isMobileValid = mobilePattern.test(mobileNumber);
+
+            
+            const popupResult = document.getElementById("popupResult");
+            if (!isEmailValid || !isMobileValid) {
+                popupResult.innerHTML = "Please correct the following errors:<br>";
+                if (!isEmailValid) {
+                    popupResult.innerHTML += "- Invalid Email<br>";
+                }
+                if (!isMobileValid) {
+                    popupResult.innerHTML += "- Invalid Mobile Number (10 digits required)<br>";
+                    document.getElementById("mobileNumber").classList.add("error");
+                } else {
+                    document.getElementById("mobileNumber").classList.remove("error");
+                }
+            } else {
+                
+                const dobParts = dob.split('-');
+                const resultText = `
+                    First Name: ${firstName}
+                    Last Name: ${lastName}
+                    Date of Birth: ${dobParts[2]}:${dobParts[1]}:${dobParts[0]}
+                    Country: ${country}
+                    Gender: ${gender}
+                    Profession: ${profession}
+                    Email: ${email}
+                    Mobile Number: ${mobileNumber}
+                `;
+                popupResult.innerHTML = resultText.replace(/\n/g, "<br>");
+                document.getElementById("popup").style.display = "block";
+            }
+        });
+
+        
+        document.getElementById("mobileNumber").addEventListener("input", function() {
+            const mobileError = document.getElementById("mobileError");
+            if (this.validity.patternMismatch) {
+                mobileError.textContent = "Invalid Mobile Number (10 digits required)";
+            } else {
+                mobileError.textContent = "";
+            }
+        });
+    </script>
+</body>
+</html>
